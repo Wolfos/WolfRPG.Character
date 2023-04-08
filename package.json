@@ -1,11 +1,11 @@
 {
-  "name": "nl.eestudio.wolfrpg.stats",
+  "name": "nl.eestudio.wolfrpg.character",
   "version": "0.1.0",
-  "displayName": "WolfRPG.Stats",
-  "description": "WolfRPG Stats Module",
+  "displayName": "WolfRPG.Character",
+  "description": "WolfRPG Character Module",
   "unity": "2021.3",
-  "documentationUrl": "https://github.com/Wolfos/WolfRPG.Stats/wiki",
-  "changelogUrl": "https://github.com/Wolfos/WolfRPG.Stats/wiki/Changelog",
+  "documentationUrl": "https://github.com/Wolfos/WolfRPG.Character/wiki",
+  "changelogUrl": "https://github.com/Wolfos/WolfRPG.Character/wiki/Changelog",
   "licensesUrl": "",
   "dependencies": {
     "nl.eestudio.wolfrpg.core": "1.1.0"
