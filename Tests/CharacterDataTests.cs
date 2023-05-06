@@ -12,13 +12,31 @@ namespace WolfRPG.Character.Tests
 			var statusEffect = new AttributeStatusEffect
 			{
 				StatusEffectName = "Bob",
-				Attribute = Attribute.Agility
+				Attribute = Attribute.Agility,
+				Duration = 1
 			};
 			
 			target.ApplyStatusEffect(statusEffect);
 			var actual = target.HasStatusEffect(statusEffect.StatusEffectName);
 			
 			Assert.IsTrue(actual);
+		}
+		
+		[Test]
+		public void ApplyStatusEffect_Attribute_DoesNotAddWhenDurationIsZero()
+		{
+			var target = new CharacterData();
+			var statusEffect = new AttributeStatusEffect
+			{
+				StatusEffectName = "Bob",
+				Attribute = Attribute.Agility,
+				Duration = 0
+			};
+			
+			target.ApplyStatusEffect(statusEffect);
+			var actual = target.HasStatusEffect(statusEffect.StatusEffectName);
+			
+			Assert.IsFalse(actual);
 		}
 		
 		[Test]
@@ -62,12 +80,14 @@ namespace WolfRPG.Character.Tests
 			var statusEffect = new SkillStatusEffect
 			{
 				StatusEffectName = "Henk",
-				Skill = Skill.Archery
+				Skill = Skill.Archery,
+				Duration = 1
 			};
 			var statusEffect2 = new AttributeStatusEffect
 			{
 				StatusEffectName = "Bob",
-				Attribute = Attribute.Agility
+				Attribute = Attribute.Agility,
+				Duration = 1
 			};
 			
 			target.ApplyStatusEffect(statusEffect);
@@ -93,12 +113,14 @@ namespace WolfRPG.Character.Tests
 			var statusEffect = new SkillStatusEffect
 			{
 				StatusEffectName = "Henk",
-				Skill = Skill.Archery
+				Skill = Skill.Archery,
+				Duration = 1
 			};
 			var statusEffect2 = new AttributeStatusEffect
 			{
 				StatusEffectName = "Bob",
-				Attribute = Attribute.Agility
+				Attribute = Attribute.Agility,
+				Duration = 1
 			};
 			
 			target.ApplyStatusEffect(statusEffect);
@@ -124,12 +146,14 @@ namespace WolfRPG.Character.Tests
 			var statusEffect = new SkillStatusEffect
 			{
 				StatusEffectName = "Henk",
-				Skill = Skill.Archery
+				Skill = Skill.Archery,
+				Duration = 1
 			};
 			var statusEffect2 = new AttributeStatusEffect
 			{
 				StatusEffectName = "Bob",
-				Attribute = Attribute.Agility
+				Attribute = Attribute.Agility,
+				Duration = 1
 			};
 			
 			target.ApplyStatusEffect(statusEffect);
@@ -184,7 +208,7 @@ namespace WolfRPG.Character.Tests
 			var statusEffect = new SkillStatusEffect
 			{
 				StatusEffectName = "Henk",
-				Duration = 10,
+				Duration = 0,
 				Permanent = true,
 				Skill = Skill.Defense
 			};
@@ -194,6 +218,113 @@ namespace WolfRPG.Character.Tests
 
 			var actual = target.HasStatusEffect(statusEffect.StatusEffectName);
 			Assert.IsTrue(actual);
+		}
+
+		[Test]
+		public void Tick_ApplyEverySecond_AppliesOverTime()
+		{
+			var attributes = new CharacterAttributes
+			{
+				Health = 0
+			};
+			var target = new CharacterData(attributes, new ());
+			var statusEffect = new AttributeStatusEffect()
+			{
+				StatusEffectName = "Healing Potion",
+				Duration = 10,
+				Effect = 1,
+				Attribute = Attribute.Health,
+				ApplyEverySecond = true
+			};
+			target.ApplyStatusEffect(statusEffect);
+
+
+			int actual;
+			for (var expected = 1; expected < 10; expected++)
+			{
+				actual = target.GetAttributeValue(Attribute.Health);
+				Assert.AreEqual(expected, actual);
+				
+				target.Tick(1);
+			}
+
+			// Call tick a bunch more times to assert it doesn't go over the expected value
+			for (var i = 0; i < 10; i++)
+			{
+				target.Tick(1);
+			}
+			
+			actual = target.GetAttributeValue(Attribute.Health);
+			Assert.AreEqual(10, actual);
+		}
+		
+		[Test]
+		public void Tick_ApplyEverySecond_CorrectWhenDeltaTimeIsOverOne()
+		{
+			var attributes = new CharacterAttributes
+			{
+				Health = 0
+			};
+			var target = new CharacterData(attributes, new ());
+			var statusEffect = new AttributeStatusEffect()
+			{
+				StatusEffectName = "Healing Potion",
+				Duration = 10,
+				Effect = 1,
+				Attribute = Attribute.Health,
+				ApplyEverySecond = true
+			};
+			target.ApplyStatusEffect(statusEffect);
+
+
+			int actual;
+			for (var expected = 1; expected < 5; expected++)
+			{
+				actual = target.GetAttributeValue(Attribute.Health);
+				Assert.AreEqual(expected * 2 - 1, actual);
+				
+				target.Tick(2);
+			}
+
+			// Call tick a bunch more times to assert it doesn't go over the expected value
+			for (var i = 0; i < 10; i++)
+			{
+				target.Tick(1);
+			}
+			
+			actual = target.GetAttributeValue(Attribute.Health);
+			Assert.AreEqual(10, actual);
+		}
+
+		[Test]
+		public void TestCase_EffectThatOnlyAppliesOnce()
+		{
+			var attributes = new CharacterAttributes
+			{
+				Health = 0
+			};
+			var target = new CharacterData(attributes, new ());
+			var statusEffect = new AttributeStatusEffect()
+			{
+				StatusEffectName = "Healing Potion",
+				Duration = 0,
+				Effect = 1,
+				Attribute = Attribute.Health,
+				ApplyEverySecond = true
+			};
+			target.ApplyStatusEffect(statusEffect);
+			
+			int actual = target.GetAttributeValue(Attribute.Health);
+			Assert.AreEqual(1, actual);
+
+			// Call tick a bunch more times to assert it doesn't go over the expected value
+			for (var i = 0; i < 10; i++)
+			{
+				target.Tick(1);
+			}
+			
+			actual = target.GetAttributeValue(Attribute.Health);
+			Assert.AreEqual(1, actual);
 		}
 		
 		[Test]
@@ -281,7 +412,8 @@ namespace WolfRPG.Character.Tests
 				StatusEffectName = "Bob",
 				Permanent = true,
 				Attribute = Attribute.Agility,
-				Effect = 10
+				Effect = 10,
+				Duration = 10
 			};
 			target.ApplyStatusEffect(statusEffect);
 
@@ -303,12 +435,14 @@ namespace WolfRPG.Character.Tests
 				StatusEffectName = "Bob",
 				Permanent = true,
 				Attribute = Attribute.Agility,
-				Effect = -20
+				Effect = -20,
+				Duration = 10
 			};
 			target.ApplyStatusEffect(statusEffect);
 
 			var actual = target.GetAttributeValue(Attribute.Agility);
 			Assert.AreEqual(0, actual);
 		}
+		
 	}
 }

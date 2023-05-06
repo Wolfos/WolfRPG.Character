@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 using WolfRPG.Core.Statistics;
 using Attribute = WolfRPG.Core.Statistics.Attribute;
 
@@ -20,11 +21,6 @@ namespace WolfRPG.Character
 		// Status effects sorted by name
 		private readonly Dictionary<string, SkillStatusEffect> _skillStatusEffectNameMap;
 
-		// All status effects that aren't permanent
-		private readonly List<AttributeStatusEffect> _expiringAttributeStatusEffects;
-		// All status effects that aren't permanent
-		private readonly List<SkillStatusEffect> _expiringSkillStatusEffects;
-
 		private float _currentTimeStamp;
 
 
@@ -42,9 +38,6 @@ namespace WolfRPG.Character
 
 			_attributeStatusEffectNameMap = new();
 			_skillStatusEffectNameMap = new();
-
-			_expiringAttributeStatusEffects = new();
-			_expiringSkillStatusEffects = new();
 		}
 
 		/// <summary>
@@ -61,9 +54,6 @@ namespace WolfRPG.Character
 			
 			_attributeStatusEffectNameMap = new();
 			_skillStatusEffectNameMap = new();
-			
-			_expiringAttributeStatusEffects = new();
-			_expiringSkillStatusEffects = new();
 		}
 
 		private void CreateMappingDictionaries()
@@ -81,15 +71,19 @@ namespace WolfRPG.Character
 
 		public void ApplyStatusEffect(AttributeStatusEffect statusEffect)
 		{
-			_attributeStatusEffects[statusEffect.Attribute].Add(statusEffect);
-			_attributeStatusEffectNameMap.Add(statusEffect.StatusEffectName, statusEffect);
-
-			if (statusEffect.Permanent == false)
+			if (statusEffect.Duration > 0 || statusEffect.Permanent)
 			{
-				_expiringAttributeStatusEffects.Add(statusEffect);
+				_attributeStatusEffects[statusEffect.Attribute].Add(statusEffect);
+				_attributeStatusEffectNameMap.Add(statusEffect.StatusEffectName, statusEffect);
+
+				statusEffect.AddedTimeStamp = _currentTimeStamp;
 			}
 
-			statusEffect.AddedTimeStamp = _currentTimeStamp;
+			if (statusEffect.ApplyEverySecond)
+			{
+				ApplyEverySecondLogic(statusEffect, true);
+				statusEffect.ApplyTimeStamp = _currentTimeStamp;
+			}
 		}
 
 		public void ApplyStatusEffect(SkillStatusEffect statusEffect)
@@ -97,11 +91,6 @@ namespace WolfRPG.Character
 			_skillStatusEffects[statusEffect.Skill].Add(statusEffect);
 			_skillStatusEffectNameMap.Add(statusEffect.StatusEffectName, statusEffect);
 
-			if (statusEffect.Permanent == false)
-			{
-				_expiringSkillStatusEffects.Add(statusEffect);
-			}
-			
 			statusEffect.AddedTimeStamp = _currentTimeStamp;
 		}
 
@@ -112,8 +101,7 @@ namespace WolfRPG.Character
 				var effect = _attributeStatusEffectNameMap[statusEffectName];
 				
 				_attributeStatusEffects[effect.Attribute].Remove(effect);
-				_attributeStatusEffectNameMap.Remove(statusEffectName);
-				_expiringAttributeStatusEffects.Remove(effect);
+				_attributeStatusEffectNameMap.Remove(statusEffectName); 
 			}
 			
 			if (_skillStatusEffectNameMap.ContainsKey(statusEffectName))
@@ -122,7 +110,6 @@ namespace WolfRPG.Character
 				
 				_skillStatusEffects[effect.Skill].Remove(effect);
 				_skillStatusEffectNameMap.Remove(statusEffectName);
-				_expiringSkillStatusEffects.Remove(effect);
 			}
 		}
 
@@ -166,34 +153,70 @@ namespace WolfRPG.Character
 		}
 
 		/// <summary>
-		/// Handles removal of non-permanent status effects over time
+		/// Handles removal of non-permanent status effects over time, and applies status effects that do damage / heal every second
 		/// </summary>
 		/// <param name="deltaTime"></param>
 		public void Tick(float deltaTime)
 		{
 			_currentTimeStamp += deltaTime;
 
-			List<string> _toRemove = new();
+			List<string> toRemove = new();
 
-			foreach (var effect in _expiringAttributeStatusEffects)
+			foreach (var kvp in _attributeStatusEffectNameMap)
 			{
-				if (_currentTimeStamp - effect.AddedTimeStamp > effect.Duration)
+				var effect = kvp.Value;
+				
+				if (effect.Permanent == false && 
+				    _currentTimeStamp - effect.AddedTimeStamp >= effect.Duration)
 				{
-					_toRemove.Add(effect.StatusEffectName);
+					toRemove.Add(effect.StatusEffectName);
+					continue;
+				}
+
+				if (effect.ApplyEverySecond)
+				{
+					// In case deltaTime is more than a second
+					int calls = 1;
+					if (deltaTime > 1)
+					{
+						calls = Mathf.CeilToInt(deltaTime);
+					}
+
+					for (int i = 0; i < calls; i++)
+					{
+						ApplyEverySecondLogic(effect);
+					}
+
+					effect.ApplyTimeStamp = _currentTimeStamp;
 				}
 			}
 			
-			foreach (var effect in _expiringSkillStatusEffects)
+			foreach (var kvp in _skillStatusEffectNameMap)
 			{
-				if (_currentTimeStamp - effect.AddedTimeStamp > effect.Duration)
+				var effect = kvp.Value;
+				if (effect.Permanent == false && 
+				    _currentTimeStamp - effect.AddedTimeStamp > effect.Duration)
 				{
-					_toRemove.Add(effect.StatusEffectName);
+					toRemove.Add(effect.StatusEffectName);
 				}
 			}
 
-			foreach (var name in _toRemove)
+			foreach (var name in toRemove)
 			{
 				RemoveStatusEffect(name);
+			}
+		}
+
+		/// <summary>
+		/// Handles the case when "ApplyEverySecond" is set to true
+		/// Timestamp check is skipped when called by ApplyStatusEffect
+		/// </summary>
+		private void ApplyEverySecondLogic(AttributeStatusEffect effect, bool force = false)
+		{
+			if (force ||
+			    _currentTimeStamp - effect.ApplyTimeStamp >= 1)
+			{
+				_attributes.ModifyAttribute(effect.Attribute, effect.Effect);
 			}
 		}
 
@@ -216,7 +239,10 @@ namespace WolfRPG.Character
 
 			foreach (var effect in _attributeStatusEffects[attribute])
 			{
-				value += effect.Effect;
+				if (effect.ApplyEverySecond == false)
+				{
+					value += effect.Effect;
+				}
 			}
 
 			// Never go below 0

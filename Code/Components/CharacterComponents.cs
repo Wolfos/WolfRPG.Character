@@ -36,6 +36,43 @@ namespace WolfRPG.Character
 				_ => 0
 			};
 		}
+
+		public void ModifyAttribute(Attribute attribute, int addition)
+		{
+			switch (attribute)
+			{
+				case Attribute.DEFAULT:
+					break;
+				case Attribute.Strength:
+					Strength += addition;
+					break;
+				case Attribute.Dexterity:
+					Dexterity += addition;
+					break;
+				case Attribute.Agility:
+					Agility += addition;
+					break;
+				case Attribute.Attunement:
+					Attunement += addition;
+					break;
+				case Attribute.Health:
+					Health += addition;
+					break;
+				case Attribute.MaxHealth:
+					MaxHealth += addition;
+					break;
+				case Attribute.Mana:
+					Mana += addition;
+					break;
+				case Attribute.MaxMana:
+					MaxMana += addition;
+					break;
+				case Attribute.MAX:
+					break;
+				default:
+					throw new ArgumentOutOfRangeException(nameof(attribute), attribute, null);
+			}
+		}
 	}
 
 	/// <summary>
