@@ -8,6 +8,9 @@ namespace WolfRPG.Character
 {
 	public class CharacterData: ICharacterData
 	{
+		public CharacterComponent CharacterComponent { get; }
+		public NpcComponent NpcComponent { get; }
+		
 		private readonly CharacterAttributes _attributes;
 		private readonly CharacterSkills _skills;
 		
@@ -43,7 +46,7 @@ namespace WolfRPG.Character
 		/// <summary>
 		/// Initializes with given values
 		/// </summary>
-		public CharacterData(CharacterAttributes attributes, CharacterSkills skills)
+		public CharacterData(CharacterAttributes attributes, CharacterSkills skills, CharacterComponent characterComponent = null, NpcComponent npcComponent = null)
 		{
 			_attributes = attributes;
 			_skills = skills;
@@ -54,6 +57,9 @@ namespace WolfRPG.Character
 			
 			_attributeStatusEffectNameMap = new();
 			_skillStatusEffectNameMap = new();
+
+			CharacterComponent = characterComponent;
+			NpcComponent = npcComponent;
 		}
 
 		private void CreateMappingDictionaries()

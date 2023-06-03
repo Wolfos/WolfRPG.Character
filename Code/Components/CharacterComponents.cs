@@ -1,10 +1,66 @@
 ﻿using System;
+using System.Collections.Generic;
+using Newtonsoft.Json;
+using UnityEngine;
 using WolfRPG.Core;
+using WolfRPG.Core.Quests;
 using WolfRPG.Core.Statistics;
 using Attribute = WolfRPG.Core.Statistics.Attribute;
 
+// ReSharper disable Unity.RedundantAttributeOnTarget
+
 namespace WolfRPG.Character
 {
+	public class CharacterComponent : IRPGComponent
+	{
+		[JsonIgnore] public string CharacterId { get; set; }
+		[HideInInspector] public Vector3 Position { get; set; }
+		[HideInInspector] public Quaternion Rotation { get; set; }
+		[HideInInspector] public bool IsDead { get; set; }
+		[HideInInspector] public float Health { get; set; }
+		public float MaxHealth { get; set; }
+		
+		
+		[HideInInspector] public Vector3 Velocity { get; set; }
+		[HideInInspector] public string CurrentTarget { get; set; }
+		[HideInInspector] public List<QuestProgress> QuestProgress { get; set; } = new();
+		[JsonIgnore] private List<QuestData> _quests;
+		
+		[JsonIgnore] public List<QuestData> Quests
+		{
+			get
+			{
+				if (_quests == null)
+				{
+					_quests = new List<QuestData>();
+					foreach (var prog in QuestProgress)
+					{
+						_quests.Add(prog.GetQuest());
+					}
+				}
+				return _quests;
+			}
+		}
+	}
+	
+	public enum NPCDemeanor
+	{
+		Friendly, Neutral, Hostile
+	}
+
+	public enum NPCRoutine
+	{
+		Idle, Wandering, Combat
+	}
+
+	public class NpcComponent : IRPGComponent
+	{
+		public NPCRoutine DefaultRoutine { get; set; }
+		[HideInInspector] public NPCRoutine CurrentRoutine { get; set; }
+		public NPCDemeanor Demeanor { get; set; }
+		[HideInInspector] public Vector3 Destination { get; set; }
+	}
+	
 	/// <summary>
 	/// Attributes are a character's inherent affinities with certain skills, and also covers health and mana
 	/// </summary>
