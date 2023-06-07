@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using UnityEngine;
 using WolfRPG.Core;
+using WolfRPG.Core.Localization;
 using WolfRPG.Core.Quests;
 using WolfRPG.Core.Statistics;
 using Attribute = WolfRPG.Core.Statistics.Attribute;
@@ -13,17 +14,17 @@ namespace WolfRPG.Character
 {
 	public class CharacterComponent : IRPGComponent
 	{
-		[JsonIgnore] public string CharacterId { get; set; }
+		public LocalizedString Name { get; set; }
+		
 		[HideInInspector] public Vector3 Position { get; set; }
 		[HideInInspector] public Quaternion Rotation { get; set; }
-		[HideInInspector] public bool IsDead { get; set; }
-		[HideInInspector] public float Health { get; set; }
-		public float MaxHealth { get; set; }
-		
+		[HideInInspector] public bool IsDead { get; set; }		
 		
 		[HideInInspector] public Vector3 Velocity { get; set; }
 		[HideInInspector] public string CurrentTarget { get; set; }
 		[HideInInspector] public List<QuestProgress> QuestProgress { get; set; } = new();
+
+		[JsonIgnore] public string CharacterId { get; set; } // TODO: This is probably not the right way about this
 		[JsonIgnore] private List<QuestData> _quests;
 		
 		[JsonIgnore] public List<QuestData> Quests
@@ -66,6 +67,7 @@ namespace WolfRPG.Character
 	/// </summary>
 	public class CharacterAttributes: IRPGComponent
 	{
+		[JsonIgnore] public Action<Attribute, int> OnAttributeUpdated { get; set; }
 		public int Strength { get; set; }
 		public int Dexterity { get; set; }
 		public int Agility { get; set; }
@@ -93,6 +95,38 @@ namespace WolfRPG.Character
 			};
 		}
 
+		public void SetAttribute(Attribute attribute, int newValue)
+		{
+			OnAttributeUpdated?.Invoke(attribute, newValue);
+			switch (attribute)
+			{
+				case Attribute.Strength:
+					Strength = newValue;
+					break;
+				case Attribute.Dexterity:
+					Dexterity = newValue;
+					break;
+				case Attribute.Agility:
+					Agility = newValue;
+					break;
+				case Attribute.Attunement:
+					Attunement = newValue;
+					break;
+				case Attribute.Health:
+					Health = newValue;
+					break;
+				case Attribute.MaxHealth:
+					MaxHealth = newValue;
+					break;
+				case Attribute.Mana:
+					Mana = newValue;
+					break;
+				case Attribute.MaxMana:
+					MaxMana = newValue;
+					break;
+			}
+		}
+
 		public void ModifyAttribute(Attribute attribute, int addition)
 		{
 			switch (attribute)
@@ -101,27 +135,35 @@ namespace WolfRPG.Character
 					break;
 				case Attribute.Strength:
 					Strength += addition;
+					OnAttributeUpdated?.Invoke(attribute, Strength);
 					break;
 				case Attribute.Dexterity:
 					Dexterity += addition;
+					OnAttributeUpdated?.Invoke(attribute, Dexterity);
 					break;
 				case Attribute.Agility:
 					Agility += addition;
+					OnAttributeUpdated?.Invoke(attribute, Agility);
 					break;
 				case Attribute.Attunement:
 					Attunement += addition;
+					OnAttributeUpdated?.Invoke(attribute, Attunement);
 					break;
 				case Attribute.Health:
 					Health += addition;
+					OnAttributeUpdated?.Invoke(attribute, Health);
 					break;
 				case Attribute.MaxHealth:
 					MaxHealth += addition;
+					OnAttributeUpdated?.Invoke(attribute, MaxHealth);
 					break;
 				case Attribute.Mana:
 					Mana += addition;
+					OnAttributeUpdated?.Invoke(attribute, Mana);
 					break;
 				case Attribute.MaxMana:
 					MaxMana += addition;
+					OnAttributeUpdated?.Invoke(attribute, MaxMana);
 					break;
 				case Attribute.MAX:
 					break;

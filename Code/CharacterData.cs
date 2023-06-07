@@ -10,8 +10,8 @@ namespace WolfRPG.Character
 	{
 		public CharacterComponent CharacterComponent { get; }
 		public NpcComponent NpcComponent { get; }
+		public CharacterAttributes Attributes { get; }
 		
-		private readonly CharacterAttributes _attributes;
 		private readonly CharacterSkills _skills;
 		
 		// Status effects sorted by Attribute
@@ -32,7 +32,7 @@ namespace WolfRPG.Character
 		/// </summary>
 		public CharacterData()
 		{
-			_attributes = new();
+			Attributes = new();
 			_skills = new();
 			
 			_attributeStatusEffects = new();
@@ -48,7 +48,7 @@ namespace WolfRPG.Character
 		/// </summary>
 		public CharacterData(CharacterAttributes attributes, CharacterSkills skills, CharacterComponent characterComponent = null, NpcComponent npcComponent = null)
 		{
-			_attributes = attributes;
+			Attributes = attributes;
 			_skills = skills;
 
 			_attributeStatusEffects = new();
@@ -222,7 +222,7 @@ namespace WolfRPG.Character
 			if (force ||
 			    _currentTimeStamp - effect.ApplyTimeStamp >= 1)
 			{
-				_attributes.ModifyAttribute(effect.Attribute, effect.Effect);
+				Attributes.ModifyAttribute(effect.Attribute, effect.Effect);
 			}
 		}
 
@@ -241,7 +241,7 @@ namespace WolfRPG.Character
 
 		public int GetAttributeValue(Attribute attribute)
 		{
-			var value = _attributes.GetAttribute(attribute);
+			var value = Attributes.GetAttribute(attribute);
 
 			foreach (var effect in _attributeStatusEffects[attribute])
 			{
@@ -254,5 +254,8 @@ namespace WolfRPG.Character
 			// Never go below 0
 			return Math.Max(value, 0);
 		}
+
+		public void SetAttributeValue(Attribute attribute, int newValue) =>
+			Attributes.SetAttribute(attribute, newValue);
 	}
 }
