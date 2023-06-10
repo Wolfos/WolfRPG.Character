@@ -24,7 +24,7 @@ namespace WolfRPG.Character
 		[HideInInspector] public string CurrentTarget { get; set; }
 		[HideInInspector] public List<QuestProgress> QuestProgress { get; set; } = new();
 
-		[JsonIgnore] public string CharacterId { get; set; } // TODO: This is probably not the right way about this
+		[HideInInspector] public string CharacterId { get; set; } // TODO: This is probably not the right way about this
 		[JsonIgnore] private List<QuestData> _quests;
 		
 		[JsonIgnore] public List<QuestData> Quests

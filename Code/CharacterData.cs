@@ -8,11 +8,12 @@ namespace WolfRPG.Character
 {
 	public class CharacterData: ICharacterData
 	{
-		public CharacterComponent CharacterComponent { get; }
-		public NpcComponent NpcComponent { get; }
-		public CharacterAttributes Attributes { get; }
+		// Setters are used by JSON
+		public CharacterComponent CharacterComponent { get; set; }
+		public NpcComponent NpcComponent { get; set; }
+		public CharacterAttributes Attributes { get; set; }
+		public CharacterSkills Skills { get; set; }
 		
-		private readonly CharacterSkills _skills;
 		
 		// Status effects sorted by Attribute
 		private readonly Dictionary<Attribute, List<AttributeStatusEffect>> _attributeStatusEffects;
@@ -33,7 +34,7 @@ namespace WolfRPG.Character
 		public CharacterData()
 		{
 			Attributes = new();
-			_skills = new();
+			Skills = new();
 			
 			_attributeStatusEffects = new();
 			_skillStatusEffects = new();
@@ -49,7 +50,7 @@ namespace WolfRPG.Character
 		public CharacterData(CharacterAttributes attributes, CharacterSkills skills, CharacterComponent characterComponent = null, NpcComponent npcComponent = null)
 		{
 			Attributes = attributes;
-			_skills = skills;
+			Skills = skills;
 
 			_attributeStatusEffects = new();
 			_skillStatusEffects = new();
@@ -228,7 +229,7 @@ namespace WolfRPG.Character
 
 		public int GetSkillValue(Skill skill)
 		{
-			var value = _skills.GetSkill(skill);
+			var value = Skills.GetSkill(skill);
 			
 			foreach(var effect in _skillStatusEffects[skill])
 			{
