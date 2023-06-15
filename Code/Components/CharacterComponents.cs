@@ -18,13 +18,12 @@ namespace WolfRPG.Character
 		
 		[HideInInspector] public Vector3 Position { get; set; }
 		[HideInInspector] public Quaternion Rotation { get; set; }
-		[HideInInspector] public bool IsDead { get; set; }		
-		
+		[HideInInspector] public bool IsDead { get; set; }
 		[HideInInspector] public Vector3 Velocity { get; set; }
 		[HideInInspector] public string CurrentTarget { get; set; }
 		[HideInInspector] public List<QuestProgress> QuestProgress { get; set; } = new();
 
-		[HideInInspector] public string CharacterId { get; set; } // TODO: This is probably not the right way about this
+		[HideInInspector] public string CharacterId { get; set; }
 		[JsonIgnore] private List<QuestData> _quests;
 		
 		[JsonIgnore] public List<QuestData> Quests
@@ -33,7 +32,7 @@ namespace WolfRPG.Character
 			{
 				if (_quests == null)
 				{
-					_quests = new List<QuestData>();
+					_quests = new();
 					foreach (var prog in QuestProgress)
 					{
 						_quests.Add(prog.GetQuest());
@@ -41,6 +40,14 @@ namespace WolfRPG.Character
 				}
 				return _quests;
 			}
+		}
+		
+		public CharacterComponent CreateInstance()
+		{
+			return new()
+			{
+				Name = Name
+			};
 		}
 	}
 	
@@ -60,6 +67,17 @@ namespace WolfRPG.Character
 		[HideInInspector] public NPCRoutine CurrentRoutine { get; set; }
 		public NPCDemeanor Demeanor { get; set; }
 		[HideInInspector] public Vector3 Destination { get; set; }
+
+		public NpcComponent CreateInstance()
+		{
+			return new()
+			{
+				DefaultRoutine = DefaultRoutine,
+				CurrentRoutine = CurrentRoutine,
+				Demeanor = Demeanor,
+				Destination = Destination
+			};
+		}
 	}
 	
 	/// <summary>
@@ -68,14 +86,14 @@ namespace WolfRPG.Character
 	public class CharacterAttributes: IRPGComponent
 	{
 		[JsonIgnore] public Action<Attribute, int> OnAttributeUpdated { get; set; }
-		public int Strength { get; set; }
-		public int Dexterity { get; set; }
-		public int Agility { get; set; }
-		public int Attunement { get; set; }
-		public int Health { get; set; }
-		public int MaxHealth { get; set; }
-		public int Mana { get; set; }
-		public int MaxMana { get; set; }
+		public int Strength { get; set; } = 10;
+		public int Dexterity { get; set; } = 10;
+		public int Agility { get; set; } = 10;
+		public int Attunement { get; set; } = 10;
+		public int Health { get; set; } = 10;
+		public int MaxHealth { get; set; } = 10;
+		public int Mana { get; set; } = 10;
+		public int MaxMana { get; set; } = 10;
 
 		public int GetAttribute(Attribute attribute)
 		{
@@ -171,6 +189,21 @@ namespace WolfRPG.Character
 					throw new ArgumentOutOfRangeException(nameof(attribute), attribute, null);
 			}
 		}
+
+		public CharacterAttributes CreateInstance()
+		{
+			return new()
+			{
+				Strength = Strength,
+				Dexterity = Dexterity,
+				Agility = Agility,
+				Attunement = Attunement,
+				Health = Health,
+				MaxHealth = MaxHealth,
+				Mana = Mana,
+				MaxMana = MaxMana
+			};
+		}
 	}
 
 	/// <summary>
@@ -178,12 +211,12 @@ namespace WolfRPG.Character
 	/// </summary>
 	public class CharacterSkills: IRPGComponent
 	{
-		public int Swordplay { get; set; }
-		public int Archery { get; set; }
-		public int Defense { get; set; }
-		public int Elemental { get; set; }
-		public int Restoration { get; set; }
-		public int Athletics { get; set; }
+		public int Swordplay { get; set; } = 1;
+		public int Archery { get; set; } = 1;
+		public int Defense { get; set; } = 1;
+		public int Elemental { get; set; } = 1;
+		public int Restoration { get; set; } = 1;
+		public int Athletics { get; set; } = 1;
 
 		public int GetSkill(Skill skill)
 		{
@@ -198,6 +231,19 @@ namespace WolfRPG.Character
 				Skill.Athletics => Athletics,
 				Skill.MAX => 0,
 				_ => 0
+			};
+		}
+
+		public CharacterSkills CreateInstance()
+		{
+			return new()
+			{
+				Swordplay = Swordplay,
+				Archery = Archery,
+				Defense = Defense,
+				Elemental = Elemental,
+				Restoration = Restoration,
+				Athletics = Athletics
 			};
 		}
 	}
