@@ -247,4 +247,13 @@ namespace WolfRPG.Character
 			};
 		}
 	}
+
+	public class CharacterCustomizationComponent : IRPGComponent
+	{
+		public Gender Gender { get; set; }
+		public int Hair { get; set; }
+		public int Head { get; set; }
+		public int Eyebrows { get; set; }
+		public int FacialHair { get; set; }
+	}
 }

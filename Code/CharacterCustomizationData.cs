@@ -1,4 +1,6 @@
-﻿namespace WolfRPG.Character
+﻿using System;
+
+namespace WolfRPG.Character
 {
 	public enum Gender
 	{
