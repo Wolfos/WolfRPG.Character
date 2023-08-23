@@ -6,69 +6,51 @@ namespace WolfRPG.Character.Tests
 	public class CharacterDataTests
 	{
 		[Test]
-		public void ApplyStatusEffect_Attribute_AddsStatusEffect()
+		public void ApplyStatusEffect_AddsStatusEffect()
 		{
 			var target = new CharacterData();
-			var statusEffect = new AttributeStatusEffect
+			var statusEffect = new StatusEffect()
 			{
-				StatusEffectName = "Bob",
-				Attribute = Attribute.Agility,
+				Id = 1337,
 				Duration = 1
 			};
 			
 			target.ApplyStatusEffect(statusEffect);
-			var actual = target.HasStatusEffect(statusEffect.StatusEffectName);
+			var actual = target.HasStatusEffect(statusEffect.Id);
 			
 			Assert.IsTrue(actual);
 		}
 		
 		[Test]
-		public void ApplyStatusEffect_Attribute_DoesNotAddWhenDurationIsZero()
+		public void ApplyStatusEffect_DoesNotAddWhenApplyOnce()
 		{
 			var target = new CharacterData();
-			var statusEffect = new AttributeStatusEffect
+			var statusEffect = new StatusEffect()
 			{
-				StatusEffectName = "Bob",
-				Attribute = Attribute.Agility,
-				Duration = 0
+				Id = 1337,
+				Duration = 0,
+				Type = StatusEffectType.ApplyOnce
 			};
 			
 			target.ApplyStatusEffect(statusEffect);
-			var actual = target.HasStatusEffect(statusEffect.StatusEffectName);
+			var actual = target.HasStatusEffect(statusEffect.Id);
 			
 			Assert.IsFalse(actual);
 		}
 		
 		[Test]
-		public void ApplyStatusEffect_Skill_AddsStatusEffect()
+		public void RemoveStatusEffect_RemovesStatusEffect()
 		{
 			var target = new CharacterData();
-			var statusEffect = new SkillStatusEffect
+			var statusEffect = new StatusEffect
 			{
-				StatusEffectName = "Henk",
-				Skill = Skill.Archery
+				Id = 1337
 			};
 			
 			target.ApplyStatusEffect(statusEffect);
-			var actual = target.HasStatusEffect(statusEffect.StatusEffectName);
+			target.RemoveStatusEffect(statusEffect.Id);
 			
-			Assert.IsTrue(actual);
-		}
-		
-		[Test]
-		public void RemoveStatusEffectSkill_RemovesStatusEffect()
-		{
-			var target = new CharacterData();
-			var statusEffect = new SkillStatusEffect
-			{
-				StatusEffectName = "Henk",
-				Skill = Skill.Defense
-			};
-			
-			target.ApplyStatusEffect(statusEffect);
-			target.RemoveStatusEffect(statusEffect.StatusEffectName);
-			
-			var actual = target.HasStatusEffect(statusEffect.StatusEffectName);
+			var actual = target.HasStatusEffect(statusEffect.Id);
 
 			Assert.IsFalse(actual);
 		}
@@ -77,99 +59,31 @@ namespace WolfRPG.Character.Tests
 		public void RemoveAllStatusEffects_RemovesAllStatusEffects()
 		{
 			var target = new CharacterData();
-			var statusEffect = new SkillStatusEffect
+			var statusEffect = new StatusEffect()
 			{
-				StatusEffectName = "Henk",
-				Skill = Skill.Archery,
+				Id = 1337,
 				Duration = 1
 			};
-			var statusEffect2 = new AttributeStatusEffect
+			var statusEffect2 = new StatusEffect()
 			{
-				StatusEffectName = "Bob",
-				Attribute = Attribute.Agility,
+				Id = 1338,
 				Duration = 1
 			};
 			
 			target.ApplyStatusEffect(statusEffect);
 			target.ApplyStatusEffect(statusEffect2);
 			
-			var actual = target.HasStatusEffect(statusEffect.StatusEffectName);
+			var actual = target.HasStatusEffect(statusEffect.Id);
 			Assert.IsTrue(actual);
-			actual = target.HasStatusEffect(statusEffect2.StatusEffectName);
+			actual = target.HasStatusEffect(statusEffect2.Id);
 			Assert.IsTrue(actual);
 			
 			target.RemoveAllStatusEffects();
 			
-			actual = target.HasStatusEffect(statusEffect.StatusEffectName);
+			actual = target.HasStatusEffect(statusEffect.Id);
 			Assert.IsFalse(actual);
-			actual = target.HasStatusEffect(statusEffect2.StatusEffectName);
+			actual = target.HasStatusEffect(statusEffect2.Id);
 			Assert.IsFalse(actual);
-		}
-		
-		[Test]
-		public void RemoveAllStatusEffects_RemovesAllStatusEffectsForAttribute()
-		{
-			var target = new CharacterData();
-			var statusEffect = new SkillStatusEffect
-			{
-				StatusEffectName = "Henk",
-				Skill = Skill.Archery,
-				Duration = 1
-			};
-			var statusEffect2 = new AttributeStatusEffect
-			{
-				StatusEffectName = "Bob",
-				Attribute = Attribute.Agility,
-				Duration = 1
-			};
-			
-			target.ApplyStatusEffect(statusEffect);
-			target.ApplyStatusEffect(statusEffect2);
-			
-			var actual = target.HasStatusEffect(statusEffect.StatusEffectName);
-			Assert.IsTrue(actual);
-			actual = target.HasStatusEffect(statusEffect2.StatusEffectName);
-			Assert.IsTrue(actual);
-			
-			target.RemoveAllStatusEffects(Attribute.Agility);
-			
-			actual = target.HasStatusEffect(statusEffect.StatusEffectName);
-			Assert.IsTrue(actual);
-			actual = target.HasStatusEffect(statusEffect2.StatusEffectName);
-			Assert.IsFalse(actual);
-		}
-		
-		[Test]
-		public void RemoveAllStatusEffects_RemovesAllStatusEffectsForSkill()
-		{
-			var target = new CharacterData();
-			var statusEffect = new SkillStatusEffect
-			{
-				StatusEffectName = "Henk",
-				Skill = Skill.Archery,
-				Duration = 1
-			};
-			var statusEffect2 = new AttributeStatusEffect
-			{
-				StatusEffectName = "Bob",
-				Attribute = Attribute.Agility,
-				Duration = 1
-			};
-			
-			target.ApplyStatusEffect(statusEffect);
-			target.ApplyStatusEffect(statusEffect2);
-			
-			var actual = target.HasStatusEffect(statusEffect.StatusEffectName);
-			Assert.IsTrue(actual);
-			actual = target.HasStatusEffect(statusEffect2.StatusEffectName);
-			Assert.IsTrue(actual);
-			
-			target.RemoveAllStatusEffects(Skill.Archery);
-			
-			actual = target.HasStatusEffect(statusEffect.StatusEffectName);
-			Assert.IsFalse(actual);
-			actual = target.HasStatusEffect(statusEffect2.StatusEffectName);
-			Assert.IsTrue(actual);
 		}
 
 		[Test]
@@ -183,21 +97,21 @@ namespace WolfRPG.Character.Tests
 		public void Tick_RemovesExpiredStatusEffect()
 		{
 			var target = new CharacterData();
-			var statusEffect = new SkillStatusEffect
+			var statusEffect = new StatusEffect()
 			{
-				StatusEffectName = "Henk",
+				Id = 1337,
 				Duration = 10,
-				Skill = Skill.Elemental
+				Type = StatusEffectType.ApplyForDuration
 			};
 			target.ApplyStatusEffect(statusEffect);
 			
 			target.Tick(5);
-			var actual = target.HasStatusEffect(statusEffect.StatusEffectName);
+			var actual = target.HasStatusEffect(statusEffect.Id);
 			Assert.IsTrue(actual);
 			
 			target.Tick(5.01f);
 
-			actual = target.HasStatusEffect(statusEffect.StatusEffectName);
+			actual = target.HasStatusEffect(statusEffect.Id);
 			Assert.IsFalse(actual);
 		}
 		
@@ -205,18 +119,17 @@ namespace WolfRPG.Character.Tests
 		public void Tick_IgnoresDurationWhenPermanent()
 		{
 			var target = new CharacterData();
-			var statusEffect = new SkillStatusEffect
+			var statusEffect = new StatusEffect
 			{
-				StatusEffectName = "Henk",
+				Id = 12,
 				Duration = 0,
-				Permanent = true,
-				Skill = Skill.Defense
+				Type = StatusEffectType.ApplyUntilRemoved,
 			};
 			target.ApplyStatusEffect(statusEffect);
 
 			target.Tick(10.01f);
 
-			var actual = target.HasStatusEffect(statusEffect.StatusEffectName);
+			var actual = target.HasStatusEffect(statusEffect.Id);
 			Assert.IsTrue(actual);
 		}
 
@@ -228,13 +141,16 @@ namespace WolfRPG.Character.Tests
 				Health = 0
 			};
 			var target = new CharacterData(attributes, new ());
-			var statusEffect = new AttributeStatusEffect()
+			var statusEffect = new StatusEffect()
 			{
-				StatusEffectName = "Healing Potion",
+				Id = 2355325,
 				Duration = 10,
-				Effect = 1,
-				Attribute = Attribute.Health,
-				ApplyEverySecond = true
+				Modifiers = new []{new StatusEffectModifier
+				{
+					Attribute = Attribute.Health,
+					Modifier = 1
+				}},
+				Type = StatusEffectType.ApplyForDuration
 			};
 			target.ApplyStatusEffect(statusEffect);
 
@@ -266,13 +182,17 @@ namespace WolfRPG.Character.Tests
 				Health = 0
 			};
 			var target = new CharacterData(attributes, new ());
-			var statusEffect = new AttributeStatusEffect()
+			var statusEffect = new StatusEffect()
 			{
-				StatusEffectName = "Healing Potion",
+				Id = 2355325,
 				Duration = 10,
-				Effect = 1,
-				Attribute = Attribute.Health,
-				ApplyEverySecond = true
+				Modifiers = new []{new StatusEffectModifier
+				{
+					Type = StatusEffectModifierType.Attribute,
+					Attribute = Attribute.Health,
+					Modifier = 1
+				}},
+				Type = StatusEffectType.ApplyForDuration
 			};
 			target.ApplyStatusEffect(statusEffect);
 
@@ -304,13 +224,17 @@ namespace WolfRPG.Character.Tests
 				Health = 0
 			};
 			var target = new CharacterData(attributes, new ());
-			var statusEffect = new AttributeStatusEffect()
+			var statusEffect = new StatusEffect()
 			{
-				StatusEffectName = "Healing Potion",
-				Duration = 0,
-				Effect = 1,
-				Attribute = Attribute.Health,
-				ApplyEverySecond = true
+				Id = 2355325,
+				Duration = 10,
+				Modifiers = new []{new StatusEffectModifier
+				{
+					Type = StatusEffectModifierType.Attribute,
+					Attribute = Attribute.Health,
+					Modifier = 1
+				}},
+				Type = StatusEffectType.ApplyOnce
 			};
 			target.ApplyStatusEffect(statusEffect);
 			
@@ -350,12 +274,17 @@ namespace WolfRPG.Character.Tests
 				Archery = 10
 			};
 			var target = new CharacterData(attributes,skills);
-			var statusEffect = new SkillStatusEffect
+			var statusEffect = new StatusEffect()
 			{
-				StatusEffectName = "Henk",
-				Permanent = true,
-				Skill = Skill.Archery,
-				Effect = 10
+				Id = 256,
+				Duration = 10,
+				Modifiers = new []{new StatusEffectModifier
+				{
+					Type = StatusEffectModifierType.Skill,
+					Skill = Skill.Archery,
+					Modifier = 10
+				}},
+				Type = StatusEffectType.ApplyUntilRemoved
 			};
 			target.ApplyStatusEffect(statusEffect);
 
@@ -372,12 +301,17 @@ namespace WolfRPG.Character.Tests
 				Archery = 10
 			};
 			var target = new CharacterData(attributes,skills);
-			var statusEffect = new SkillStatusEffect
+			var statusEffect = new StatusEffect
 			{
-				StatusEffectName = "Henk",
-				Permanent = true,
-				Skill = Skill.Archery,
-				Effect = -20
+				Id = 257,
+				Duration = 10,
+				Modifiers = new []{new StatusEffectModifier
+				{
+					Type = StatusEffectModifierType.Skill,
+					Skill = Skill.Archery,
+					Modifier = -20
+				}},
+				Type = StatusEffectType.ApplyUntilRemoved
 			};
 			target.ApplyStatusEffect(statusEffect);
 
@@ -407,13 +341,18 @@ namespace WolfRPG.Character.Tests
 			};
 			var skills = new CharacterSkills();
 			var target = new CharacterData(attributes,skills);
-			var statusEffect = new AttributeStatusEffect
+			
+			var statusEffect = new StatusEffect()
 			{
-				StatusEffectName = "Bob",
-				Permanent = true,
-				Attribute = Attribute.Agility,
-				Effect = 10,
-				Duration = 10
+				Id = 5634654,
+				Duration = 10,
+				Modifiers = new []{new StatusEffectModifier
+				{
+					Type = StatusEffectModifierType.Attribute,
+					Attribute = Attribute.Agility,
+					Modifier = 10
+				}},
+				Type = StatusEffectType.ApplyOnce
 			};
 			target.ApplyStatusEffect(statusEffect);
 
@@ -430,13 +369,17 @@ namespace WolfRPG.Character.Tests
 			};
 			var skills = new CharacterSkills();
 			var target = new CharacterData(attributes,skills);
-			var statusEffect = new AttributeStatusEffect
+			var statusEffect = new StatusEffect()
 			{
-				StatusEffectName = "Bob",
-				Permanent = true,
-				Attribute = Attribute.Agility,
-				Effect = -20,
-				Duration = 10
+				Id = 5634654,
+				Duration = 10,
+				Modifiers = new []{new StatusEffectModifier
+				{
+					Type = StatusEffectModifierType.Attribute,
+					Attribute = Attribute.Agility,
+					Modifier = -20
+				}},
+				Type = StatusEffectType.ApplyOnce
 			};
 			target.ApplyStatusEffect(statusEffect);
 

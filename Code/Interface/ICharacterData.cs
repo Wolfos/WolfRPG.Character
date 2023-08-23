@@ -4,13 +4,10 @@ namespace WolfRPG.Character
 {
 	public interface ICharacterData
 	{
-		void ApplyStatusEffect(AttributeStatusEffect statusEffect);
-		void ApplyStatusEffect(SkillStatusEffect statusEffect);
-		void RemoveStatusEffect(string statusEffectName);
+		void ApplyStatusEffect(StatusEffect statusEffect);
+		void RemoveStatusEffect(int id);
 		void RemoveAllStatusEffects();
-		void RemoveAllStatusEffects(Attribute attribute);
-		void RemoveAllStatusEffects(Skill skill);
-		bool HasStatusEffect(string statusEffectName);
+		bool HasStatusEffect(int id);
 		void Tick(float deltaTime);
 		int GetSkillValue(Skill skill);
 		int GetAttributeValue(Attribute attribute);
