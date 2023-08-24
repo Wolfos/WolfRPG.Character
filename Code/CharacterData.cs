@@ -47,7 +47,7 @@ namespace WolfRPG.Character
 
 		public void ApplyStatusEffect(RPGObjectReference objectReference)
 		{
-			var effect = objectReference.GetComponent<StatusEffect>();
+			var effect = objectReference.GetComponent<StatusEffect>().GetInstance();
 			if (effect == null)
 			{
 				Debug.LogError($"Object {objectReference.Guid} is not a valid status effect");
