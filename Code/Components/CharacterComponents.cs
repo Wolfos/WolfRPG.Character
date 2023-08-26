@@ -94,6 +94,7 @@ namespace WolfRPG.Character
 		public int MaxHealth { get; set; } = 10;
 		public int Mana { get; set; } = 10;
 		public int MaxMana { get; set; } = 10;
+		public int MaxCarryWeight { get; set; } = 50;
 
 		public int GetAttribute(Attribute attribute)
 		{
@@ -108,6 +109,7 @@ namespace WolfRPG.Character
 				Attribute.MaxHealth => MaxHealth,
 				Attribute.Mana => Mana,
 				Attribute.MaxMana => MaxMana,
+				Attribute.MaxCarryWeight => MaxCarryWeight,
 				Attribute.MAX => 0,
 				_ => 0
 			};
@@ -141,6 +143,9 @@ namespace WolfRPG.Character
 					break;
 				case Attribute.MaxMana:
 					MaxMana = newValue;
+					break;
+				case Attribute.MaxCarryWeight:
+					MaxCarryWeight = newValue;
 					break;
 			}
 		}
