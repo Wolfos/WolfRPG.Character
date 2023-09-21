@@ -182,6 +182,7 @@ namespace WolfRPG.Character
 		{
 			var value = Attributes.GetAttribute(attribute);
 
+			// TODO: Optimize if necessary
 			foreach(var effect in _statusEffects)
 			{
 				if(effect.Type != StatusEffectType.ApplyUntilRemoved) continue;
