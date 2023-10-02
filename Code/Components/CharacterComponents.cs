@@ -14,6 +14,8 @@ namespace WolfRPG.Character
 {
 	public class CharacterComponent : IRPGComponent
 	{
+		[AssetReference(typeof(GameObject))]
+		public AssetReference Prefab { get; set; }
 		public LocalizedString Name { get; set; }
 		
 		[HideInInspector] public Vector3 Position { get; set; }
@@ -22,6 +24,9 @@ namespace WolfRPG.Character
 		[HideInInspector] public Vector3 Velocity { get; set; }
 		[HideInInspector] public string CurrentTarget { get; set; }
 		[HideInInspector] public List<QuestProgress> QuestProgress { get; set; } = new();
+		public CharacterCustomizationData VisualData { get; set; }
+		
+		// Don't forget to update CreateInstance if you add a new value!
 
 		[HideInInspector] public string CharacterId { get; set; }
 		[JsonIgnore] private List<QuestData> _quests;
@@ -46,7 +51,9 @@ namespace WolfRPG.Character
 		{
 			return new()
 			{
-				Name = Name
+				Name = Name,
+				VisualData = VisualData,
+				Prefab = Prefab
 			};
 		}
 	}
@@ -251,14 +258,5 @@ namespace WolfRPG.Character
 				Athletics = Athletics
 			};
 		}
-	}
-
-	public class CharacterCustomizationComponent : IRPGComponent
-	{
-		public Gender Gender { get; set; }
-		public int Hair { get; set; }
-		public int Head { get; set; }
-		public int Eyebrows { get; set; }
-		public int FacialHair { get; set; }
 	}
 }
