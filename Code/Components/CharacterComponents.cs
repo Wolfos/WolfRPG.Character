@@ -74,7 +74,13 @@ namespace WolfRPG.Character
 		[HideInInspector] public NPCRoutine CurrentRoutine { get; set; }
 		public NPCDemeanor Demeanor { get; set; }
 		[HideInInspector] public Vector3 Destination { get; set; }
+		public bool IsShopKeeper { get; set; }
+		[DBReference(3)] // category 3 = shops
+		public RPGObjectReference Shop { get; set; }
+		[AssetReference(typeof(ScriptableObject))] // We don't have access to the specific type here
+		public AssetReference Dialogue { get; set; }
 
+		// TODO: Refactor to remove mutable data
 		public NpcComponent CreateInstance()
 		{
 			return new()
@@ -82,7 +88,10 @@ namespace WolfRPG.Character
 				DefaultRoutine = DefaultRoutine,
 				CurrentRoutine = CurrentRoutine,
 				Demeanor = Demeanor,
-				Destination = Destination
+				Destination = Destination,
+				IsShopKeeper = IsShopKeeper,
+				Shop = Shop,
+				Dialogue = Dialogue
 			};
 		}
 	}
