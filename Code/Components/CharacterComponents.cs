@@ -23,30 +23,12 @@ namespace WolfRPG.Character
 		[HideInInspector] public bool IsDead { get; set; }
 		[HideInInspector] public Vector3 Velocity { get; set; }
 		[HideInInspector] public string CurrentTarget { get; set; }
-		[HideInInspector] public List<QuestProgress> QuestProgress { get; set; } = new();
 		public CharacterCustomizationData VisualData { get; set; }
 		
 		// Don't forget to update CreateInstance if you add a new value!
 
 		[HideInInspector] public string CharacterId { get; set; }
-		[JsonIgnore] private List<QuestData> _quests;
-		
-		[JsonIgnore] public List<QuestData> Quests
-		{
-			get
-			{
-				if (_quests == null)
-				{
-					_quests = new();
-					foreach (var prog in QuestProgress)
-					{
-						_quests.Add(prog.GetQuest());
-					}
-				}
-				return _quests;
-			}
-		}
-		
+
 		public CharacterComponent CreateInstance()
 		{
 			return new()
