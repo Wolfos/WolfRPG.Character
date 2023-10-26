@@ -8,7 +8,7 @@ namespace WolfRPG.Character
 	}
 	public enum CharacterCustomizationPart
 	{
-		Gender, Hair, BackAttachment, Head, Eyebrows, FacialHair, Torso, ArmUpperRight, ArmUpperLeft, ArmLowerRight, ArmLowerLeft, HandRight, HandLeft, Hips, LegRight, LegLeft, SkinColor
+		Gender, Hair, BackAttachment, Head, Eyebrows, FacialHair, Torso, ArmUpperRight, ArmUpperLeft, ArmLowerRight, ArmLowerLeft, HandRight, HandLeft, Hips, LegRight, LegLeft, SkinColor, Eyes
 	}
 	
 	public class CharacterCustomizationData
@@ -17,6 +17,7 @@ namespace WolfRPG.Character
 		public int Hair { get; set; }
 		public int BackAttachment { get; set; }
 		public int Head { get; set; }
+		public int Eyes { get; set; }
 		public int Eyebrows { get; set; }
 		public int FacialHair { get; set; }
 		public int Torso { get; set; }
