@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using Unity.Plastic.Newtonsoft.Json;
 
 namespace WolfRPG.Character
 {
@@ -31,5 +33,8 @@ namespace WolfRPG.Character
 		public int LegRight { get; set; }
 		public int LegLeft { get; set; }
 		public int SkinColor { get; set; }
+		
+		[JsonIgnore] // Field is computed at runtime
+		public Dictionary<CharacterCustomizationPart, int> MaterialOverrides { get; set; } = new();
 	}
 }
