@@ -17,6 +17,7 @@ namespace WolfRPG.Character
 		[AssetReference(typeof(GameObject))]
 		public AssetReference Prefab { get; set; }
 		public LocalizedString Name { get; set; }
+		public bool Invulnerable { get; set; }
 		
 		[HideInInspector] public Vector3 Position { get; set; }
 		[HideInInspector] public Quaternion Rotation { get; set; }
@@ -35,7 +36,8 @@ namespace WolfRPG.Character
 			{
 				Name = Name,
 				VisualData = VisualData,
-				Prefab = Prefab
+				Prefab = Prefab,
+				Invulnerable = Invulnerable
 			};
 		}
 	}
